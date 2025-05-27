@@ -1,3 +1,4 @@
+#include "main.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -19,6 +20,8 @@ int history_count = 0;
 
 void addToHistory(char operator, double num1, double num2, double result)
 {
+    int i;
+
     if (history_count < MAX_HISTORY)
     {
         history[history_count].operator = operator;
@@ -29,7 +32,7 @@ void addToHistory(char operator, double num1, double num2, double result)
     }
     else
     {
-        for (int i = 1; i < MAX_HISTORY; i++)
+        for ( i = 1; i < MAX_HISTORY; i++)
         {
             history[i - 1] = history[i];
         }
@@ -42,6 +45,8 @@ void addToHistory(char operator, double num1, double num2, double result)
 
 void showHistory()
 {
+    int i;
+    
     printf("\nCalculation History:\n");
     if (history_count == 0)
     {
@@ -49,7 +54,7 @@ void showHistory()
         return;
     }
     printf("-------------------\n\n");
-    for (int i = 0; i < history_count; i++)
+    for (i = 0; i < history_count; i++)
     {
         printf("%d: %.2lf %c %.2lf = %.2lf\n",
                i + 1,
@@ -147,8 +152,7 @@ int main()
     while (1)
     {
         printMenu();
-        printf("Enter your operation (or 'h' for history, 'm' for memory functions, 'q' to quit): ");
-        scanf(" %s", input);
+              scanf(" %s", input);
         if (strlen(input) == 0)
         {
             printf("No input provided. Please try again.\n");
@@ -171,81 +175,99 @@ int main()
                 memoryMenu(&memory);
                 continue;
             }
-            else
-            {
-                printf("Invalid operation. Please try again.\n");
+            if (op == 's' || op == 'l' || op == 'e' || op == 'c' || op == 't') {
+                printf("Enter a number: ");
+                scanf("%lf", &num1);
+                
+                if (num1 < 0 && (op == 's' || op == 'l')) {
+                    printf("Error! Negative numbers are not allowed for this operation.\n");
+                    continue;
+                }
+
+                switch(op) {
+                    case 's':
+                        result = sqrt(num1);
+                        printf("sqrt(%.2lf) = %.2lf\n", num1, result);
+                        addToHistory(num1, 0, 's', result);
+                        break;
+                    case 'l':
+                        result = calculate_log10(num1);
+                        printf("log10(%.2lf) = %.2lf\n", num1, result);
+                        addToHistory(num1, 0, 'l', result);
+                        break;
+                    case 'e':
+                        result = calculate_ln(num1);
+                        printf("ln(%.2lf) = %.2lf\n", num1, result);
+                        addToHistory(num1, 0, 'n', result);
+                        break;
+                    case 'c':
+                        result = cos(num1);
+                        printf("cos(%.2lf) = %.2lf\n", num1, result);
+                        addToHistory(num1, 0, 'c', result);
+                        break;
+                    case 't':
+                        result = tan(num1);
+                        printf("tan(%.2lf) = %.2lf\n", num1, result);
+                        addToHistory(num1, 0, 't', result);
+                        break;
+                }
                 continue;
             }
-
-            if (op == 's' || op == 'l' || op == 'e' || op == 'c' || op == 't')
-            {
-                printf("Enter number: ");
-                scanf("%lf", &num1);
-                switch (op)
-                {
-                case 's':
-                    result = sqrt(num1);
-                    operator = '√';
-                    break;
-                case 'l':
-                    result = log10(num1);
-                    operator = 'l';
-                    break;
-                case 'e':
-                    result = log(num1);
-                    operator = 'e';
-                    break;
-                case 'c':
-                    result = cos(num1);
-                    operator = 'c';
-                    break;
-                case 't':
-                    result = tan(num1);
-                    operator = 't';
-                    break;
-                default:
-                    continue;
+        if (op == '+' || op == '-' || op == '*' || op == '/' || op == '^') {
+                printf("Use memory for first operand? (y/n): ");
+                char memChoice;
+                scanf(" %c", &memChoice);
+                if (memChoice == 'y') {
+                    num1 = memory;
+                    printf("Using memory value: %.2lf\n", num1);
+                } else {
+                    printf("Enter first number: ");
+                    scanf("%lf", &num1);
                 }
-            }
-            else
-            {
-                printf("Enter first number: ");
-                scanf("%lf", &num1);
-                printf("Enter second number: ");
-                scanf("%lf", &num2);
-
-                switch (op)
-                {
-                case '+':
-                    result = num1 + num2;
-                    operator = '+';
-                    break;
-                case '-':
-                    result = num1 - num2;
-                    operator = '-';
-                    break;
-                case '*':
-                    result = num1 * num2;
-                    operator = '*';
-                    break;
-                case '/':
-                    if (num2 == 0)
-                    {
-                        printf("Error: Division by zero.\n");
-                        continue;
-                    }
-                    result = num1 / num2;
-                    operator = '/';
-                    break;
-                case '^':
-                    result = pow(num1, num2);
-                    operator = '^';
-                    break;
-                default:
-                    printf("Invalid operation. Please try again.\n");
-                    continue;
+                
+                printf("Use memory for second operand? (y/n): ");
+                scanf(" %c", &memChoice);
+                if (memChoice == 'y') {
+                    num2 = memory;
+                    printf("Using memory value: %.2lf\n", num2);
+                } else {
+                    printf("Enter second number: ");
+                    scanf("%lf", &num2);
                 }
+                
+                switch(op) {
+                    case '+':
+                        result = num1 + num2;
+                        printf("%.2lf + %.2lf = %.2lf\n", num1, num2, result);
+                        break;
+                    case '-':
+                        result = num1 - num2;
+                        printf("%.2lf - %.2lf = %.2lf\n", num1, num2, result);
+                        break;
+                    case '*':
+                        result = num1 * num2;
+                        printf("%.2lf * %.2lf = %.2lf\n", num1, num2, result);
+                        break;
+                    case '/':
+                        if (num2 != 0) {
+                            result = num1 / num2;
+                            printf("%.2lf / %.2lf = %.2lf\n", num1, num2, result);
+                        } else {
+                            printf("Error! Division by zero.\n");
+                            continue;
+                        }
+                        break;
+                    case '^':
+                        result = pow(num1, num2);
+                        printf("%.2lf ^ %.2lf = %.2lf\n", num1, num2, result);
+                        break;
+                }
+                addToHistory(num1, num2, op, result);
             }
+        } else {
+            printf("Invalid input. Please enter a single character option.\n");
         }
     }
+    
+    return 0;
 }
