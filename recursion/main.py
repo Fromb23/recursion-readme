@@ -17,7 +17,6 @@ def run_all():
 
     print("\n4. Traverse Nested List Recursively")
     traverse_recursive([1, [2, [3, 4], 5]])
-
     print("\n5. Traverse Nested List Non-Recursively")
     traverse_iterative([1, [2, [3, 4], 5]])
 
