@@ -11,7 +11,7 @@
 		"path": "cloned_repo/tasks/factorial",
 		"main": "main.py",
 		"target": "factorial.py",
-		"expected_output": "expected_output.txt"
+		"expected_output": "factorial(0) = 1\nfactorial(1) = 1\nfactorial(3) = 6\nfactorial(5) = 120\n"	
 	}
 ]
 
