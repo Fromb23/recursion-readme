@@ -2,7 +2,7 @@
 
 ## Objective
 
-Write a recursive function called `countdown(n)` that prints numbers starting from a given positive integer `n` down to 0.
+Write a recursive function called `def recursion(n)` that prints numbers starting from a given positive integer `n` down to 0.
 
 ## 📚 Recursion Basics
 
@@ -21,7 +21,7 @@ Recursion is when a function calls itself to solve smaller instances of the same
 
 **Function Call:**
 ```python
-countdown(3)
+recursion(3)
 ```
 
 **Expected output:**
