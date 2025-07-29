@@ -29,14 +29,6 @@ def factorial(n):
     pass
 ```
 
-**Your function should:**
-
-- Accept a single non-negative integer n.
-
-- Return the factorial of n, defined as:
-
-- n! = n × (n-1) × (n-2) × ... × 1
-
 Base case:
 `factorial(0)` or `factorial(1)` should return `1`.
 
