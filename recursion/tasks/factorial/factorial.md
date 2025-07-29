@@ -38,7 +38,7 @@ def factorial(n):
 - n! = n × (n-1) × (n-2) × ... × 1
 
 Base case:
-factorial(0) or factorial(1) should return 1.
+`factorial(0)` or `factorial(1)` should return `1`.
 
 ## 🧪 Examples
 
@@ -53,7 +53,8 @@ factorial(0) or factorial(1) should return 1.
 1
 ```
 ## ⚠️ Rules
-- You must use recursion.
+- To understand how it works, review [recursion](../countdown/countdown.md) before continuing.
+- You must use `recursion`.
 
 - You must not use loops (__for__ or __while__).
 
