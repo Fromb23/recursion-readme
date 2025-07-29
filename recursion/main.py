@@ -1,5 +1,5 @@
 # main.py
-from tasks.countdown import countdown
+from recursion.tasks.countdown.countdown import countdown
 from tasks.factorial import recursive_factorial
 from tasks.factorial_compare import compare_factorials
 from tasks.nested_traverse import traverse_recursive, traverse_iterative
