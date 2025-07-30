@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../checker.h"
-#include "typewriter.h"
+#include "../main/checker.h"
+#include "../typewriter/typewriter.h"
+#include "validators.h"
 
 /* Left-strip whitespace from a string */
 char *lstrip(char *str)
@@ -14,15 +15,15 @@ char *lstrip(char *str)
 
 int validate_recursion_file(const char *filepath)
 {
-	FILE *fp;
+	FILE *fp = NULL;
 	char line[1024];
-	int found_docstring = 0;
 	char expected_func[512];
 	char func_name[256];
-	const char *filename;
-	size_t len;
-	char *trimmed_line;
+	const char *filename = NULL;
+	char *trimmed_line = NULL;
 	char message[2048];
+	int found_docstring = 0;
+	size_t len = 0;
 
 	if (filepath == NULL)
 	{
@@ -147,7 +148,7 @@ int validate_recursion_file(const char *filepath)
 
 	/* Only successful result is animated */
 	snprintf(message, sizeof(message), "%s passed recursion file checks.\n", filepath);
-	typewrite(message, 25000);
+	typewrite(25000, "%s", message);
 
 	fclose(fp);
 	return 0;
