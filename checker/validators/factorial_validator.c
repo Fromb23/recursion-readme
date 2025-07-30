@@ -2,43 +2,35 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "../checker.h"
+#include "../main/checker.h"
 #include "validators.h"
 #include "../typewriter/typewriter.h"
 
 int validate_factorial_file(const char *filepath)
 {
-	FILE *fp;
+	FILE *fp = NULL;
 	char line[1024];
-	char *trimmed_line;
-	int found_docstring;
-	char *success_msg;
+	char *trimmed_line = NULL;
+	int found_docstring = 0;
+	int inside_docstring = 0;
+	char *success_msg = NULL;
 
-	fp = NULL;
-	trimmed_line = NULL;
-	found_docstring = 0;
-	success_msg = NULL;
-
-	if (!filepath)
+	if (filepath == NULL)
 	{
-		typewrite("Error: NULL filepath for factorial file\n", 3000);
+		typewrite(3000, "Error: NULL filepath for factorial file\n");
 		return 1;
 	}
 
 	fp = fopen(filepath, "r");
-	if (!fp)
+	if (fp == NULL)
 	{
-		typewrite("Error opening file: ", 3000);
-		typewrite(filepath, 3000);
-		typewrite("\n", 3000);
+		typewrite(3000, "Error opening file: %s\n", filepath);
 		return 1;
 	}
 
-	if (!fgets(line, sizeof(line), fp))
+	if (fgets(line, sizeof(line), fp) == NULL)
 	{
-		typewrite("Error: ", 3000);
-		typewrite(filepath, 3000);
-		typewrite(" is empty\n", 3000);
+		typewrite(3000, "Error: %s is empty\n", filepath);
 		fclose(fp);
 		return 1;
 	}
@@ -47,16 +39,14 @@ int validate_factorial_file(const char *filepath)
 
 	if (strncmp(trimmed_line, "#!/usr/bin/env python3", 23) != 0)
 	{
-		typewrite("Error: First line must be '#!/usr/bin/env python3'\n", 3000);
+		typewrite(3000, "Error: First line must be '#!/usr/bin/env python3'\n");
 		fclose(fp);
 		return 1;
 	}
 
-	if (!fgets(line, sizeof(line), fp))
+	if (fgets(line, sizeof(line), fp) == NULL)
 	{
-		typewrite("Error: Second line missing in ", 3000);
-		typewrite(filepath, 3000);
-		typewrite("\n", 3000);
+		typewrite(3000, "Error: Second line missing in %s\n", filepath);
 		fclose(fp);
 		return 1;
 	}
@@ -65,16 +55,14 @@ int validate_factorial_file(const char *filepath)
 
 	if (strlen(trimmed_line) != 0)
 	{
-		typewrite("Error: Second line must be blank\n", 3000);
+		typewrite(3000, "Error: Second line must be blank\n");
 		fclose(fp);
 		return 1;
 	}
 
-	if (!fgets(line, sizeof(line), fp))
+	if (fgets(line, sizeof(line), fp) == NULL)
 	{
-		typewrite("Error: Third line missing in ", 3000);
-		typewrite(filepath, 3000);
-		typewrite("\n", 4000);
+		typewrite(3000, "Error: Third line missing in %s\n", filepath);
 		fclose(fp);
 		return 1;
 	}
@@ -83,46 +71,53 @@ int validate_factorial_file(const char *filepath)
 
 	if (strncmp(trimmed_line, "def factorial(n)", 16) != 0)
 	{
-		typewrite("Error: Expected 'def factorial(n)' as function prototype\n", 3000);
+		typewrite(3000, "Error: Expected 'def factorial(n)' as function prototype\n");
 		fclose(fp);
 		return 1;
 	}
 
-	while (fgets(line, sizeof(line), fp))
+	while (fgets(line, sizeof(line), fp) != NULL)
 	{
 		line[strcspn(line, "\r\n")] = '\0';
 		trimmed_line = lstrip(line);
 
-		if (strstr(trimmed_line, "for") || strstr(trimmed_line, "while"))
+		if (strncmp(trimmed_line, "\"\"\"", 3) == 0 || strncmp(trimmed_line, "'''", 3) == 0)
 		{
-			typewrite("Error: Loops ('for' or 'while') are not allowed in factorial tasks\n", 3000);
-			fclose(fp);
-			return 1;
+			if (!found_docstring)
+				found_docstring = 1;
+
+			inside_docstring = !inside_docstring;
+			continue;
 		}
 
-		if (!found_docstring &&
-				(strncmp(trimmed_line, "\"\"\"", 3) == 0 || strncmp(trimmed_line, "'''", 3) == 0))
+		if (inside_docstring)
+			continue;
+
+		if (strstr(trimmed_line, "for ") != NULL || strstr(trimmed_line, "while ") != NULL)
 		{
-			found_docstring = 1;
+			typewrite(3000, "Error: Loops ('for' or 'while') are not allowed in factorial tasks\n");
+			fclose(fp);
+			return 1;
 		}
 	}
 
 	if (!found_docstring)
 	{
-		typewrite("Error: Missing docstring in factorial function\n", 3000);
+		typewrite(3000, "Error: Missing docstring in factorial function\n");
 		fclose(fp);
 		return 1;
 	}
 
-	success_msg = malloc(strlen(filepath) + 40);
-	if (!success_msg)
+	success_msg = malloc(strlen(filepath) + 50);
+	if (success_msg == NULL)
 	{
 		fclose(fp);
 		return 1;
 	}
 
 	sprintf(success_msg, "%s passed factorial file checks.\n", filepath);
-	typewrite(success_msg, 3000);
+	typewrite(3000, "%s", success_msg);
+
 	free(success_msg);
 	fclose(fp);
 	return 0;
