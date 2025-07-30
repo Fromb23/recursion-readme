@@ -25,7 +25,7 @@ char *lstrip(char *str);
 int clone_repo(const char *url, const char *dest_folder);
 int load_tasks(const char *json_file, Task *tasks, int *task_count);
 int check_task_files(Task *task);
-int validate_recursion_file(const char *filepath);
 int check_output(const char *script_path, const char *expected_output);
+void free_tasks(Task *tasks, int count);
 
 #endif
