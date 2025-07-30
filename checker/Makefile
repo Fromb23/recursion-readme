@@ -1,9 +1,9 @@
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89
-SRC = $(wildcard *.c typewriter/*.c)
+CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89 -Itypewriter -Ivalidators
+SRC = $(wildcard *.c typewriter/*.c validators/*.c)
 OBJ = $(SRC:.c=.o)
-	DEPS = checker.h
-	BIN = checker
+DEPS = checker.h validators/validators.h
+BIN = checker
 
 .PHONY: all clean fclean re run
 
