@@ -9,6 +9,7 @@
 
 #define MAX_FILES 10
 #define MAX_TASKS 100
+#define MAX_TASK_NAMES 20
 
 typedef struct {
 	char *task_name;
@@ -21,5 +22,7 @@ typedef struct {
 } Task;
 
 char *lstrip(char *str);
+int filter_tasks(Task *tasks, int task_count, const char *filter_names,
+                 Task *filtered, int *filtered_count);
 
 #endif

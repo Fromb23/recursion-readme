@@ -3,6 +3,9 @@
 
 #include "../main/checker.h"
 
+extern char **g_task_names;
+extern int g_task_name_count;
+
 char *get_directory_path(const char *filepath, char *output, size_t size);
 int check_task_files(Task *task);
 void free_tasks(Task *tasks, int count);

@@ -1,6 +1,13 @@
 #include "utils.h"
 #include <json-c/json.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../typewriter/typewriter.h"
+
+/* External global task names and count declared in main */
+char **g_task_names;
+int g_task_name_count;
 
 int load_tasks(const char *json_file, Task *tasks, int *task_count)
 {
@@ -8,8 +15,9 @@ int load_tasks(const char *json_file, Task *tasks, int *task_count)
 	long length;
 	char *data;
 	struct json_object *parsed;
-	int i;
+	int i, j;
 	int count;
+	int loaded_count;
 	struct json_object *obj;
 	struct json_object *name_obj;
 	struct json_object *path_obj;
@@ -22,6 +30,7 @@ int load_tasks(const char *json_file, Task *tasks, int *task_count)
 	const char *target;
 	const char *expected;
 	char msg[512];
+	int match;
 
 	fp = fopen(json_file, "r");
 	if (!fp)
@@ -80,6 +89,7 @@ int load_tasks(const char *json_file, Task *tasks, int *task_count)
 		count = MAX_TASKS;
 	}
 
+	loaded_count = 0;
 	for (i = 0; i < count; i++)
 	{
 		obj = json_object_array_get_idx(parsed, i);
@@ -105,23 +115,40 @@ int load_tasks(const char *json_file, Task *tasks, int *task_count)
 			continue;
 		}
 
-		tasks[i].task_name = strdup(name);
-		tasks[i].expected_path = strdup(path);
-		tasks[i].main_file = strdup(main);
-		tasks[i].target_file = strdup(target);
-		tasks[i].expected_output = strdup(expected);
+		match = 0;
+		for (j = 0; j < g_task_name_count; j++)
+		{
+			if (strcmp(name, g_task_names[j]) == 0)
+			{
+				match = 1;
+				break;
+			}
+		}
 
-		tasks[i].expected_files[0] = strdup("__init__.py");
-		tasks[i].expected_files[1] = strdup(tasks[i].main_file);
-		tasks[i].expected_files[2] = strdup(tasks[i].target_file);
-		tasks[i].file_count = 3;
+		if (!match)
+			continue;
+
+		tasks[loaded_count].task_name = strdup(name);
+		tasks[loaded_count].expected_path = strdup(path);
+		tasks[loaded_count].main_file = strdup(main);
+		tasks[loaded_count].target_file = strdup(target);
+		tasks[loaded_count].expected_output = strdup(expected);
+
+		tasks[loaded_count].expected_files[0] = strdup("__init__.py");
+		tasks[loaded_count].expected_files[1] = strdup(tasks[loaded_count].main_file);
+		tasks[loaded_count].expected_files[2] = strdup(tasks[loaded_count].target_file);
+		tasks[loaded_count].file_count = 3;
 
 		snprintf(msg, sizeof(msg), "Loaded Task %d: name=%s path=%s target=%s\n",
-				i + 1, tasks[i].task_name, tasks[i].expected_path, tasks[i].target_file);
+				loaded_count + 1, tasks[loaded_count].task_name,
+				tasks[loaded_count].expected_path,
+				tasks[loaded_count].target_file);
 		typewrite(20000, "%s", msg);
+
+		loaded_count++;
 	}
 
-	*task_count = count;
+	*task_count = loaded_count;
 	free(data);
 	return 0;
 }
