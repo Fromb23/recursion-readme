@@ -1,18 +1,41 @@
-#include "typewriter/typewriter.h"
+#include "validators/validators.h"
+#include "typewriter.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "checker.h"
 
-int main(void)
+int main(int argc, char *argv[])
 {
-	const char *repo_url = "https://github.com/Fromb23/recursion-readme.git";
-	const char *target_dir = "cloned_repo";
+	const char *repo_url;
+	const char *task_name;
+	const char *target_dir;
 	Task tasks[MAX_TASKS];
-	int task_count = 0, clone_result, i;
+	int task_count, found_task = 0;
+	int clone_result;
+	int i;
 	char main_script_path[1024];
 	char msg[512];
+
+	repo_url = NULL;
+	task_name = NULL;
+	target_dir = "cloned_repo";
+	task_count = 0;
+
+	for (i = 1; i < argc; i++)
+	{
+		if (strcmp(argv[i], "--task-name") == 0 && i + 1 < argc)
+			task_name = argv[++i];
+		else if (strcmp(argv[i], "--repo") == 0 && i + 1 < argc)
+			repo_url = argv[++i];
+	}
+
+	if (!repo_url || !task_name)
+	{
+		fprintf(stderr, "Usage: %s --task-name <name> --repo <url>\n", argv[0]);
+		return 1;
+	}
 
 	memset(tasks, 0, sizeof(tasks));
 
@@ -41,10 +64,29 @@ int main(void)
 		fprintf(stderr, "Failed to load tasks from JSON.\n");
 		return 1;
 	}
+	
+	for (i = 0; i < task_count; i++)
+	{
+		if (strcmp(tasks[i].task_name, task_name) == 0)
+		{
+			found_task = 1;
+			break;
+		}
+	}
+
+	if (!found_task)
+	{
+		fprintf(stderr, "Error: Task '%s' not found in tasks.json\n", task_name);
+		return 1;
+	}
+
 
 	for (i = 0; i < task_count; i++)
 	{
 		const char *name = tasks[i].task_name ? tasks[i].task_name : "Unnamed";
+
+		if (strcmp(task_name, name) != 0)
+			continue;
 
 		printf("\n");
 		typewrite("----------------------\n ", 30000);
@@ -64,9 +106,10 @@ int main(void)
 
 		snprintf(main_script_path, sizeof(main_script_path), "%s/%s",
 				tasks[i].expected_path, tasks[i].target_file);
-		if (validate_recursion_file(main_script_path) != 0)
+
+		if (validate_task(&tasks[i], main_script_path) != 0)
 		{
-			fprintf(stderr, "Validation recursion function failed for %s\n", main_script_path);
+			fprintf(stderr, "Validation failed for %s\n", main_script_path);
 			continue;
 		}
 
@@ -86,6 +129,7 @@ int main(void)
 		}
 	}
 
+	free_tasks(tasks, task_count);
 	typewrite("\nChecker finished.\n", 30000);
 	return 0;
 }
