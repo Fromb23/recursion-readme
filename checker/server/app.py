@@ -50,10 +50,11 @@ def validate():
                 )
 
     # Otherwise return JSON
+    semantic_error = "Validation failed" in result.stderr or "Missing" in result.stderr or "not found" in result.stderr
     return {
             "task_name": task_name,
             "repo_url": repo_url,
-            "exit_code": result.returncode,
+            "exit_code": 1 if semantic_error or result.returncode != 0 else 0,
             "stdout": result.stdout,
             "stderr": result.stderr
             }
