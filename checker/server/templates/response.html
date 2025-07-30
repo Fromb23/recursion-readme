@@ -1,95 +1,149 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checker Result</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '#1e40af',
-            secondary: '#1f2937',
-            card: '#1e293b'
-          }
-        }
-      }
-    }
-  </script>
-</head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white dark:bg-card shadow-md rounded-xl p-6 md:p-8 max-w-2xl w-full space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">Checker Result</h1>
-      <button id="themeToggle" class="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-gray-800 dark:text-gray-100">
-        Toggle Theme
-      </button>
-    </div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Checker Result</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				darkMode: 'class',
+				theme: {
+					extend: {
+						colors: {
+							primary: '#1e40af',
+							secondary: '#1f2937',
+							card: '#1e293b'
+						}
+					}
+				}
+			}
+		</script>
+	</head>
+	<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex items-center justify-center p-4">
+		<div class="bg-white dark:bg-card shadow-md rounded-xl p-6 md:p-8 max-w-2xl w-full space-y-6">
+			<!-- Header -->
+			<div class="flex justify-between items-center">
+				<h1 class="text-xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">Checker Result</h1>
+				<button id="themeToggle" class="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-gray-800 dark:text-gray-100">
+					Toggle Theme
+				</button>
+			</div>
 
-    <div class="grid md:grid-cols-2 gap-4 text-sm">
-      <div>
-        <p class="text-gray-500 dark:text-gray-400 font-medium">Task Name</p>
-        <p class="font-semibold">{{ task_name }}</p>
-      </div>
-      <div>
-        <p class="text-gray-500 dark:text-gray-400 font-medium">Repository URL</p>
-        <a href="{{ repo_url }}" target="_blank" class="text-blue-600 dark:text-blue-400 underline break-all">{{ repo_url }}</a>
-      </div>
-    </div>
+			<!-- Task Info -->
+			<div class="grid md:grid-cols-2 gap-4 text-sm">
+				<div>
+					<p class="text-gray-500 dark:text-gray-400 font-medium">Task Name</p>
+					<p class="font-semibold">{{ task_name }}</p>
+				</div>
+				<div>
+					<p class="text-gray-500 dark:text-gray-400 font-medium">Repository URL</p>
+					<a href="{{ repo_url }}" target="_blank" class="text-blue-600 dark:text-blue-400 underline break-all">{{ repo_url }}</a>
+				</div>
+			</div>
 
-    <div>
-      <p class="text-gray-500 dark:text-gray-400 font-medium">Exit Code</p>
-      <span class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-bold
-        {% if exit_code == 0 %}
-          bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
-        {% else %}
-          bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
-        {% endif %}">
-        {{ exit_code }} — {% if exit_code == 0 %}Success{% else %}Failure{% endif %}
-      </span>
-    </div>
+			<!-- Standard Output -->
+			<div>
+				<p class="text-gray-500 dark:text-gray-400 font-medium mb-1">Standard Output</p>
+				<pre id="stdout-typewriter" class="bg-gray-100 dark:bg-gray-800 text-black dark:text-gray-200 text-sm p-4 rounded overflow-auto font-mono"></pre>
+			</div>
 
-    <div>
-      <p class="text-gray-500 dark:text-gray-400 font-medium mb-1">Standard Output</p>
-      <pre class="bg-gray-100 dark:bg-gray-800 text-black dark:text-gray-200 text-sm p-4 rounded overflow-auto font-mono">{{ stdout }}</pre>
-    </div>
+			{% if "Invalid Git repository URL" in stderr %}
+			<p class="text-sm text-yellow-400 font-medium">
+			Hint: Did you forget to add <code>.git</code> at the end of the repo URL?
+			</p>
+			{% endif %}
+			<!-- Exit Code (initially hidden) -->
+			<div id="exit-code-container" class="hidden">
+				<p class="text-gray-500 dark:text-gray-400 font-medium">Exit Code</p>
+				<span class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-bold
+					     {% if exit_code == 0 %}
+					     bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+					     {% else %}
+					     bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+					     {% endif %}">
+					{{ exit_code }} — {% if exit_code == 0 %}Success{% else %}Failure{% endif %}
+				</span>
+			</div>
 
-    <div>
-      <p class="text-gray-500 dark:text-gray-400 font-medium mb-1">Error Output</p>
-      {% if stderr %}
-        <pre class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm p-4 rounded overflow-auto font-mono">{{ stderr }}</pre>
-      {% else %}
-        <p class="text-green-600 dark:text-green-400 font-semibold">No errors encountered</p>
-      {% endif %}
-    </div>
+			<!-- Error Output (initially hidden) -->
+			<div id="error-output-container" class="hidden">
+				<p class="text-gray-500 dark:text-gray-400 font-medium mb-1">Error Output</p>
+				{% if stderr %}
+				<pre class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm p-4 rounded overflow-auto font-mono">{{ stderr }}</pre>
+				{% else %}
+				<p class="text-green-600 dark:text-green-400 font-semibold">No errors encountered</p>
+				{% endif %}
+			</div>
 
-    <div class="text-center">
-      <a href="/" class="inline-block mt-4 px-4 py-2 rounded-lg bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold text-sm">
-        Run Another Check
-      </a>
-    </div>
-  </div>
+			<!-- Action Buttons -->
+			<div class="flex flex-col sm:flex-row justify-center gap-3 mt-6 text-center">
+				<!-- Rerun Check -->
+				<form method="POST" action="/validate">
+					<input type="hidden" name="task_name" value="{{ task_name }}">
+					<input type="hidden" name="repo_url" value="{{ repo_url }}">
+					<button type="submit" class="px-4 py-2 rounded-lg bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 text-white font-semibold text-sm">
+						Rerun Check
+					</button>
+				</form>
 
-  <script>
-    // Dark/light toggle with localStorage
-    const toggle = document.getElementById("themeToggle");
-    const html = document.documentElement;
-    const savedTheme = localStorage.getItem("theme");
+				<!-- Run Another Check -->
+				<a href="/" class="px-4 py-2 rounded-lg bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold text-sm">
+					Run Another Check
+				</a>
 
-    if (savedTheme === "light") {
-      html.classList.remove("dark");
-    } else {
-      html.classList.add("dark");
-    }
+				<!-- Close -->
+				<!--
+				<a href="/" class="px-4 py-2 rounded-lg bg-gray-500 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-600 text-white font-semibold text-sm">
+					Close
+				</a>
+				-->
+			</div>
+		</div>
 
-    toggle.addEventListener("click", () => {
-      html.classList.toggle("dark");
-      localStorage.setItem("theme", html.classList.contains("dark") ? "dark" : "light");
-    });
-  </script>
-</body>
+		<!-- Theme Toggle Logic -->
+		<script>
+			const toggle = document.getElementById("themeToggle");
+			const html = document.documentElement;
+			const savedTheme = localStorage.getItem("theme");
+
+			if (savedTheme === "light") {
+				html.classList.remove("dark");
+			} else {
+				html.classList.add("dark");
+			}
+
+			toggle.addEventListener("click", () => {
+				html.classList.toggle("dark");
+				localStorage.setItem("theme", html.classList.contains("dark") ? "dark" : "light");
+			});
+		</script>
+
+		<!-- Typewriter Effect -->
+		<script type="module">
+			import { typeWriter } from "/static/js/typewriter.js";
+
+	const text = {{ stdout | tojson | default('""') | safe }};
+	const target = document.getElementById("stdout-typewriter");
+	const exitCodeContainer = document.getElementById("exit-code-container");
+	const errorOutputContainer = document.getElementById("error-output-container");
+
+	// Optional initial loading state
+	target.textContent = "Running checks...\n";
+
+	// Start the typewriter animation
+	typeWriter(text, target, 12).then(() => {
+		// Show exit code + stderr after animation completes
+		exitCodeContainer.classList.remove("hidden");
+		errorOutputContainer.classList.remove("hidden");
+
+		// Scroll to bottom for visibility
+		window.scrollTo({
+			top: document.body.scrollHeight,
+			behavior: "smooth"
+		});
+	});
+		</script>
+
+	</body>
 </html>
-
