@@ -1,7 +1,7 @@
 #ifndef REGISTRY_HASH_H
 #define REGISTRY_HASH_H
 
-#include "../../main/checker.h"
+#include "../validators.h"
 
 typedef int (*ValidatorFn)(const char *filepath);
 
