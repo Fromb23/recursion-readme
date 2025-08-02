@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89 \
-         -Imain -Iutils -Itypewriter -Ivalidators -Ivalidators/linters
+         -Imain -Iutils -Itypewriter -Ivalidators -Ivalidators/linters \
+         -DOPENSSL_API_COMPAT=0x30000000L -Wno-deprecated-declarations
 
 SRC = $(wildcard main/*.c utils/*.c typewriter/*.c validators/*.c validators/linters/*.c)
 OBJ = $(SRC:.c=.o)
@@ -11,7 +12,7 @@ BIN = checker
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ -ljson-c
+	$(CC) $(CFLAGS) -o $@ $^ -ljson-c -lssl -lcrypto
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
