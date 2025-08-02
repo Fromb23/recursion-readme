@@ -1,9 +1,13 @@
 CC = gcc
+
 CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89 \
          -Imain -Iutils -Itypewriter -Ivalidators -Ivalidators/linters \
+         -Ivalidators/basics -Ivalidators/hash \
          -DOPENSSL_API_COMPAT=0x30000000L -Wno-deprecated-declarations
 
-SRC = $(wildcard main/*.c utils/*.c typewriter/*.c validators/*.c validators/linters/*.c logs/*.c) 
+DIRS = main utils typewriter validators validators/linters validators/basics validators/hash logs
+SRC = $(foreach dir, $(DIRS), $(wildcard $(dir)/*.c))
+
 OBJ = $(SRC:.c=.o)
 BIN = checker
 
