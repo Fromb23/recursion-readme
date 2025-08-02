@@ -13,6 +13,9 @@ int is_valid_git_url(const char *url);
 int check_output(const char *script_path, const char *expected_string);
 void trim_trailing_whitespace(char *str);
 int clone_repo(const char *url, const char *target_dir);
-int load_tasks(const char *json_file, Task *tasks, int *task_count);
+char *extract_username(const char *url);
+int rename_repo(const char *old, const char *new_path);
+int update_repo(const char *dir);
+int load_tasks(const char *json_file, const char *repo_dir, Task *tasks, int *task_count);
 
 #endif
