@@ -11,11 +11,12 @@
 int main(int argc, char *argv[])
 {
 	const char *repo_url = NULL;
+	char repo_dir[256];
 	char *task_names[MAX_TASK_NAMES];
 	char main_script_path[1024];
 	char msg[512];
-	char *token, *end;
-	int task_name_count = 0;
+	char *token, *end, *username;
+	int task_name_count = 0, result;
 	int task_count = 0;
 	int clone_result = 0;
 	int i, j, t, match, any_failed = 0;
@@ -66,25 +67,52 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (access("cloned_repo", F_OK) != 0)
+	username = extract_username(repo_url);
+	if (!username)
+	{
+		fprintf(stderr, "Could not extract GitHub username.\n");
+		return 1;
+	}
+	snprintf(repo_dir, sizeof(repo_dir), "cloned_repo_%s", username);
+	if (access(repo_dir, F_OK) != 0)
 	{
 		typewrite(30000, "Cloning repository...\n");
 		clone_result = clone_repo(repo_url, "cloned_repo");
 		if (clone_result != 0)
 		{
 			fprintf(stderr, "Failed to clone the repository.\n");
+			free(username);
 			return 1;
 		}
 		printf("Repository cloned successfully into 'cloned_repo'\n");
+
+		typewrite(100000, "Renaming repository....\n");
+		if (rename_repo("cloned_repo", repo_dir) != 0)
+		{
+			perror("Rename failed");
+			free(username);
+			return 1;
+		}
+		free(username);
 	}
 	else
 	{
-		snprintf(msg, sizeof(msg), "Repository already exists at '%s', skipping clone.\n", "cloned_repo");
+		snprintf(msg, sizeof(msg), "Repository already exists at '%s', updating....\n", repo_dir);
 		typewrite(25000, msg);
+		result = update_repo(repo_dir);
+		if (result != 0)
+		{
+			fprintf(stderr, "Failed to update the repository.\n");
+			return 1;
+		}
+		typewrite(3000, "Repository updated successfully...\n");
+		printf("\n");
+		printf("..............\n");
+		printf("\n");
 	}
 
 	typewrite(30000, "Loading tasks...\n");
-	if (load_tasks("tasks.json", tasks, &task_count) != 0)
+	if (load_tasks("tasks.json", repo_dir, tasks, &task_count) != 0)
 	{
 		fprintf(stderr, "Failed to load tasks from JSON.\n");
 		return 1;
@@ -166,5 +194,8 @@ int main(int argc, char *argv[])
 	free_tasks(tasks, task_count);
 	if (!any_failed)
 		typewrite(30000, "\nChecker completed successfully.\n");
+	else
+		typewrite(30000, "\nChecker completed with some failures.\n");
+
 	return any_failed;
 }

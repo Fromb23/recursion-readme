@@ -11,6 +11,8 @@
 #define MAX_TASKS 100
 #define MAX_TASK_NAMES 20
 
+#define LOG_PATH "logs/hashes.log"
+
 typedef struct {
 	char *task_name;
 	char *expected_path;
@@ -19,6 +21,7 @@ typedef struct {
 	char *expected_output;
 	char *expected_files[10];
 	int file_count;
+	char *username;
 } Task;
 
 char *lstrip(char *str);
