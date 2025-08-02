@@ -6,6 +6,12 @@
 
 #define HASH_LENGTH 65
 
+typedef int (*ValidatorFn)(const char *filepath);
+
+typedef struct {
+	const char *task_name;
+	ValidatorFn validator;
+} TaskValidator;
 
 int validate_task(Task *task, const char *filepath);
 int validate_recursion_file(const char *filepath);
