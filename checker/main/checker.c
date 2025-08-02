@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "checker.h"
 #include "typewriter.h"
+#include "../logs/logs.h"
 #include "../utils/utils.h"
 #include "../validators/validators.h"
 
@@ -85,6 +86,7 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		printf("Repository cloned successfully into 'cloned_repo'\n");
+		log_clone_time(username, repo_dir);
 
 		typewrite(100000, "Renaming repository....\n");
 		if (rename_repo("cloned_repo", repo_dir) != 0)
@@ -93,7 +95,6 @@ int main(int argc, char *argv[])
 			free(username);
 			return 1;
 		}
-		free(username);
 	}
 	else
 	{
@@ -110,6 +111,7 @@ int main(int argc, char *argv[])
 		printf("..............\n");
 		printf("\n");
 	}
+	free(username);
 
 	typewrite(30000, "Loading tasks...\n");
 	if (load_tasks("tasks.json", repo_dir, tasks, &task_count) != 0)
