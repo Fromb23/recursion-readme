@@ -31,9 +31,16 @@ int validate_task(Task *task, const char *filepath)
 		fprintf(stderr, "No validator defined for task: %s\n", task->task_name);
 		return 1;
 	}
-	if (!result)
-		return 0;
+	if (result != 0)
+		return 1;
 
-	return 1;
+	/*
+	if (check_plagiarism(filepath, task) != 0)
+	{
+		fprintf(stderr, "Plagiarism check failed for file: %s\n", filepath);
+		return 1;
+	}
+	*/
+	return 0;
 }
 
