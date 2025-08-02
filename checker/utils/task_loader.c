@@ -9,7 +9,7 @@
 char **g_task_names;
 int g_task_name_count;
 
-int load_tasks(const char *json_file, Task *tasks, int *task_count)
+int load_tasks(const char *json_file, const char *repo_dir, Task *tasks, int *task_count)
 {
 	FILE *fp;
 	long length;
@@ -25,6 +25,7 @@ int load_tasks(const char *json_file, Task *tasks, int *task_count)
 	struct json_object *target_obj;
 	struct json_object *expected_obj;
 	const char *name;
+	char full_path[512];
 	const char *path;
 	const char *main;
 	const char *target;
@@ -127,17 +128,18 @@ int load_tasks(const char *json_file, Task *tasks, int *task_count)
 
 		if (!match)
 			continue;
+		snprintf(full_path, sizeof(full_path), "%s/%s", repo_dir, path);
+
 
 		tasks[loaded_count].task_name = strdup(name);
-		tasks[loaded_count].expected_path = strdup(path);
+		tasks[loaded_count].expected_path = strdup(full_path);
 		tasks[loaded_count].main_file = strdup(main);
 		tasks[loaded_count].target_file = strdup(target);
 		tasks[loaded_count].expected_output = strdup(expected);
 
-		tasks[loaded_count].expected_files[0] = strdup("__init__.py");
-		tasks[loaded_count].expected_files[1] = strdup(tasks[loaded_count].main_file);
-		tasks[loaded_count].expected_files[2] = strdup(tasks[loaded_count].target_file);
-		tasks[loaded_count].file_count = 3;
+		tasks[loaded_count].expected_files[0] = strdup(tasks[loaded_count].main_file);
+		tasks[loaded_count].expected_files[1] = strdup(tasks[loaded_count].target_file);
+		tasks[loaded_count].file_count = 2;
 
 		snprintf(msg, sizeof(msg), "Loaded Task %d: name=%s path=%s target=%s\n",
 				loaded_count + 1, tasks[loaded_count].task_name,
@@ -150,5 +152,6 @@ int load_tasks(const char *json_file, Task *tasks, int *task_count)
 
 	*task_count = loaded_count;
 	free(data);
+	json_object_put(parsed);
 	return 0;
 }
