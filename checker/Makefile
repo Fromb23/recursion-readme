@@ -3,7 +3,7 @@ CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89 \
          -Imain -Iutils -Itypewriter -Ivalidators -Ivalidators/linters \
          -DOPENSSL_API_COMPAT=0x30000000L -Wno-deprecated-declarations
 
-SRC = $(wildcard main/*.c utils/*.c typewriter/*.c validators/*.c validators/linters/*.c)
+SRC = $(wildcard main/*.c utils/*.c typewriter/*.c validators/*.c validators/linters/*.c logs/*.c) 
 OBJ = $(SRC:.c=.o)
 BIN = checker
 
