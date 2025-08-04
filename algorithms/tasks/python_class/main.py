@@ -1,4 +1,4 @@
-from bank_account import BankAccount
+from algorithms.tasks.python_class.bank import BankAccount
 
 def run_check():
     print("=== Bank Account Class Check ===")
