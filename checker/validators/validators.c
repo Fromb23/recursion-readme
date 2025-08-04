@@ -12,7 +12,8 @@ int dispatch_validation(Task *task, const char *filepath)
 		return fn(filepath);
 	else {
 		fprintf(stderr, "No validator found for task: %s\n", task->task_name);
-		return -1;
+		printf("/n");
+		return 1;
 	}
 }
 
@@ -23,6 +24,7 @@ int validate_task(Task *task, const char *filepath)
 	if (!check_readme(task->expected_path))
 	{
 		fprintf(stderr, "Missing or empty README.md in %s\n", task->expected_path);
+		printf("/n");
 		return 1;
 	}
 

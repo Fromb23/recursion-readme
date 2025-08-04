@@ -114,7 +114,8 @@ int main(int argc, char *argv[])
 	free(username);
 
 	typewrite(30000, "Loading tasks...\n");
-	if (load_tasks("tasks.json", repo_dir, tasks, &task_count) != 0)
+
+	if (load_tasks("json_tasks", repo_dir, tasks, &task_count) != 0)
 	{
 		fprintf(stderr, "Failed to load tasks from JSON.\n");
 		return 1;

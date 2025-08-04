@@ -13,6 +13,12 @@
 
 #define LOG_PATH "logs/hashes.log"
 
+typedef enum {
+    SUCCESS = 0,
+    FAILED  = 1,
+    ERROR   = 2
+} ValidationStatus;
+
 typedef struct {
 	char *task_name;
 	char *expected_path;
