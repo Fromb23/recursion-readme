@@ -16,6 +16,8 @@ int clone_repo(const char *url, const char *target_dir);
 char *extract_username(const char *url);
 int rename_repo(const char *old, const char *new_path);
 int update_repo(const char *dir);
-int load_tasks(const char *json_file, const char *repo_dir, Task *tasks, int *task_count);
+int load_tasks(const char *json_source, const char *repo_dir, Task *tasks, int *task_count);
+int load_tasks_from_directory(const char *json_dir, const char *repo_dir, Task *tasks, int *task_count);
+int is_directory(const char *path);
 
 #endif

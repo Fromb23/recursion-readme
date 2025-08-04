@@ -1,5 +1,9 @@
 #include "utils.h"
 #include <json-c/json.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +13,67 @@
 char **g_task_names;
 int g_task_name_count;
 
-int load_tasks(const char *json_file, const char *repo_dir, Task *tasks, int *task_count)
+int is_directory(const char *path)
+{
+	struct stat st;
+	return (stat(path, &st) == 0 && S_ISDIR(st.st_mode));
+}
+
+int load_tasks_from_directory(const char *json_dir, const char *repo_dir, Task *tasks, int *task_count)
+{
+	DIR *dir;
+	struct dirent *entry;
+	char path[1024];
+	int result;
+	int prev_count;
+
+	dir = opendir(json_dir);
+	if (!dir)
+	{
+		perror("Could not open JSON tasks directory");
+		return 1;
+	}
+
+	while ((entry = readdir(dir)) != NULL)
+	{
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+
+		snprintf(path, sizeof(path), "%s/%s", json_dir, entry->d_name);
+
+		if (entry->d_type == DT_DIR)
+		{
+			result = load_tasks_from_directory(path, repo_dir, tasks, task_count);
+			if (result == 0)
+			{
+				closedir(dir);
+				return 0;
+			}
+		}
+		else if (entry->d_type == DT_REG && strstr(entry->d_name, ".json") != NULL)
+		{
+			prev_count = *task_count;
+			result = load_tasks(path, repo_dir, tasks, task_count);
+
+			if (result != 0)
+			{
+				fprintf(stderr, "Failed to load %s\n", path);
+				continue;
+			}
+
+			if (*task_count > prev_count)
+			{
+				closedir(dir);
+				return 0;
+			}
+		}
+	}
+
+	closedir(dir);
+	return 1;
+}
+
+int load_tasks(const char *json_source, const char *repo_dir, Task *tasks, int *task_count)
 {
 	FILE *fp;
 	long length;
@@ -33,10 +97,14 @@ int load_tasks(const char *json_file, const char *repo_dir, Task *tasks, int *ta
 	char msg[512];
 	int match;
 
-	fp = fopen(json_file, "r");
+	if (is_directory(json_source))
+	{
+		return load_tasks_from_directory(json_source, repo_dir, tasks, task_count);
+	}
+	fp = fopen(json_source, "r");
 	if (!fp)
 	{
-		fprintf(stderr, "Could not open JSON file: %s\n", json_file);
+		fprintf(stderr, "Could not open JSON file: %s\n", json_source);
 		return 1;
 	}
 
