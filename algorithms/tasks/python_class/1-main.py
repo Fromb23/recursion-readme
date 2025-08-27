@@ -5,7 +5,7 @@ BankAccount = __import__('1-bank').BankAccount
 
 # Test instantiation with name and account_number
 try:
-    account = BankAccount("Alice Smith", "987654321")
+    account = BankAccount("Francis Rombo", "987654321")
     print("BankAccount created successfully!")
     print(f"Account object: {account}")
     print(f"Account type: {type(account)}")

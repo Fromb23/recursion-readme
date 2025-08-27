@@ -3,7 +3,6 @@
 
 BankAccount = __import__('5-bank').BankAccount
 
-# Test transaction logging functionality
 try:
     account = BankAccount("Frank Miller", "444555666")
     
@@ -11,22 +10,18 @@ try:
     print(f"Account number: {account.get_account_number()}")
     print(f"Initial balance: ${account.get_balance()}")
     
-    # Test deposits with logging
     account.deposit(1000)
     account.deposit(500)
     account.deposit(250)
     
-    # Test withdrawals with logging
     account.withdraw(300)
     account.withdraw(150)
     
-    # Test invalid operations (should not be logged)
-    account.deposit(-50)  # Invalid deposit
-    account.withdraw(2000)  # Insufficient funds
+    account.deposit(-50)
+    account.withdraw(2000)
     
     print(f"\nFinal balance: ${account.get_balance()}")
     
-    # Display transaction log
     print("\nTransaction History:")
     transactions = account.get_transaction_log()
     if transactions:
